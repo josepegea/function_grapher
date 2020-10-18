@@ -15,11 +15,13 @@ class FunctionGrapher
   def graph
     canvas.delete('all')
     draw_axes
-    x = min_x
-    while x < max_x do
-      old_x = x
+    cx = 0
+    max_cx = canvas.winfo_width
+    while cx < max_cx do
+      old_x = f_x(cx)
       old_y = function.evaluate(x: old_x)
-      x += 1
+      cx += 1
+      x = f_x(cx)
       y = function.evaluate(x: x)
       TkcLine.new(canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y))
     end

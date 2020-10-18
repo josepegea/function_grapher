@@ -7,9 +7,17 @@ require_relative './function_grapher'
 
 def graph
   fe = FunctionEvaluator.new($function)
-  puts("Graphing....#{fe.evaluate(x: 3)}")
   fg = FunctionGrapher.new(fe, $canvas, $zoom)
   fg.graph
+end
+
+def mousewheel
+  proc do |d|
+    z = $zoom.value.to_f
+    z = d > 0 ? z * 1.1 : z * 0.9
+    $zoom.value = (z).to_s
+    graph
+  end
 end
 
 # Main window
@@ -37,6 +45,8 @@ $canvas.grid sticky: 'nwes', column: 2, row: 1, rowspan: 2
 $zoom = TkVariable.new(1)
 zoom_l = Tk::Tile::Label.new(content) {text 'Zoom:'}.grid( :column => 2, :row => 3, :sticky => 'ws')
 zoom_t = Tk::Tile::Entry.new(content) {width 4; textvariable $zoom}.grid( column: 2, :row => 3 )
+
+$canvas.bind("MouseWheel", mousewheel, '%D')
 
 TkGrid.columnconfigure content, 1, weight: 0
 TkGrid.columnconfigure content, 2, weight: 1
