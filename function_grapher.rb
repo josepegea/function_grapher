@@ -20,7 +20,7 @@ class FunctionGrapher
     while cx < max_cx do
       old_x = f_x(cx)
       old_y = function.evaluate(x: old_x)
-      cx += 1
+      cx += 2
       x = f_x(cx)
       y = function.evaluate(x: x)
       TkcLine.new(canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y))
