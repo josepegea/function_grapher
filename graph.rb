@@ -8,7 +8,7 @@ require_relative './function_grapher'
 def graph
   fe = FunctionEvaluator.new($function)
   puts("Graphing....#{fe.evaluate(x: 3)}")
-  fg = FunctionGrapher.new(fe, $canvas)
+  fg = FunctionGrapher.new(fe, $canvas, $zoom)
   fg.graph
 end
 
@@ -32,8 +32,11 @@ graph_button = Tk::Tile::Button.new(content) { text "Graph!"; default "active"; 
 graph_button.grid(column: 1, row: 3, sticky: 'ews')
 
 $canvas = TkCanvas.new(content) { width 200; height 200 }
-$canvas.grid sticky: 'nwes', column: 2, row: 1, rowspan: 3
+$canvas.grid sticky: 'nwes', column: 2, row: 1, rowspan: 2
 
+$zoom = TkVariable.new(1)
+zoom_l = Tk::Tile::Label.new(content) {text 'Zoom:'}.grid( :column => 2, :row => 3, :sticky => 'ws')
+zoom_t = Tk::Tile::Entry.new(content) {width 4; textvariable $zoom}.grid( column: 2, :row => 3 )
 
 TkGrid.columnconfigure content, 1, weight: 0
 TkGrid.columnconfigure content, 2, weight: 1
