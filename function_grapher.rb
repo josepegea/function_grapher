@@ -48,10 +48,10 @@ class FunctionGrapher
   end
 
   def c_x(x)
-    (x - x_orig) * x_size / canvas.width
+    (x - x_orig) * canvas.winfo_width / x_size
   end
 
   def c_y(y)
-    canvas.height - ((y - y_orig) * y_size / canvas.height)
+    canvas.winfo_height - ((y - y_orig) * canvas.winfo_height / y_size)
   end
 end

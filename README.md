@@ -23,6 +23,9 @@ case, it failed the first time but repeating the command worked.
   
 - https://www.tutorialspoint.com/ruby/ruby_tk_guide.htm
 
+- https://tcl.tk/man/tcl8.6/TkCmd/contents.htm (General TK ref)
+
+
 
 
 

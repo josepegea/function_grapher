@@ -26,14 +26,19 @@ $function = TkVariable.new("100 * Math.sin(x)")
 # function_t = TkText.new(content) {width 40; height 5; wrap "none"; textvariable $function}
 # ys = Tk::Tile::Scrollbar.new(root) {orient 'vertical'; command proc{|*args| function_t.yview(*args);}}
 # function_t['yscrollcommand'] = proc{|*args| ys.set(*args);}
-function_t = Tk::Tile::Entry.new(content) {width 20; textvariable $function}.grid( column: 1, :row => 2, :sticky => 'nws' )
-function_t.grid(column: 1, row: 1, sticky: 'w')
-
-$canvas = TkCanvas.new(content) { width 200; height 200 }
-$canvas.grid :sticky => 'nwes', :column => 2, :row => 1
+function_t = Tk::Tile::Entry.new(content) {width 20; textvariable $function}.grid( column: 1, :row => 2, :sticky => 'wns' )
 
 graph_button = Tk::Tile::Button.new(content) { text "Graph!"; default "active"; command { graph } }
-graph_button.grid(column: 1, row: 1, sticky: 's')
+graph_button.grid(column: 1, row: 3, sticky: 'ews')
+
+$canvas = TkCanvas.new(content) { width 200; height 200 }
+$canvas.grid sticky: 'nwes', column: 2, row: 1, rowspan: 3
+
+
+TkGrid.columnconfigure content, 1, weight: 0
+TkGrid.columnconfigure content, 2, weight: 1
+TkGrid.rowconfigure content, 1, weight: 0
+TkGrid.rowconfigure content, 2, weight: 1
 
 Tk.mainloop
 
