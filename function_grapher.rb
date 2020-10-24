@@ -16,20 +16,21 @@ class FunctionGrapher
     canvas.delete('all')
     draw_axes
     cx = 0
+    x = y = old_x = old_y = nil
     max_cx = canvas.winfo_width
     while cx < max_cx do
-      old_x = f_x(cx)
-      old_y = function.evaluate(x: old_x)
-      cx += 2
       x = f_x(cx)
       y = function.evaluate(x: x)
-      TkcLine.new(canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y))
+      TkcLine.new(canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
+      old_x = x
+      old_y = y
+      cx += 1
     end
   end
 
   def draw_axes
-    TkcLine.new(canvas, c_x(0), 0, c_x(0), canvas.winfo_height)
-    TkcLine.new(canvas, 0, c_y(0), canvas.winfo_width, c_y(0))
+    TkcLine.new(canvas, c_x(0), 0, c_x(0), canvas.winfo_height, fill: 'blue')
+    TkcLine.new(canvas, 0, c_y(0), canvas.winfo_width, c_y(0), fill: 'blue')
   end
 
   def min_x
