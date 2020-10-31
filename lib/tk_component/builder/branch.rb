@@ -45,8 +45,8 @@ module TkComponent
           yield(builder)
           add_node(builder)
         else
-          if method_name.to_s.match(/^on_/)
-            add_event_handler(method_name, *args)
+          if method_name.to_s.match(/^on_(.*)/)
+            add_event_handler($1, *args)
           else
             add_node(Leaf.new(method_name, *args))
           end

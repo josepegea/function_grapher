@@ -6,7 +6,7 @@ module TkComponent
       attr_accessor :options
 
       def initialize(name, lambda, options = {})
-        @name = name
+        @name = name.to_sym
         @lambda = lambda
         @options = options
       end

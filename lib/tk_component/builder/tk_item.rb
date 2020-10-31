@@ -16,6 +16,7 @@ module TkComponent
         @native_item = tk_class.new(parent_item.native_item)
         apply_options(options)
         set_grid(grid)
+        set_event_handlers(event_handlers)
       end
 
       def apply_options(options)
@@ -38,6 +39,21 @@ module TkComponent
         grid_map.row_indexes.each { |r| TkGrid.rowconfigure(self.native_item, r, weight: grid_map.row_weight(r)) }
         # grid_map.column_indexes.each { |c| TkGrid.columnconfigure(self.native_item, c, weight: 1) }
         # grid_map.row_indexes.each { |r| TkGrid.rowconfigure(self.native_item, r, weight: 1) }
+      end
+
+      def set_event_handlers(event_handlers)
+        event_handlers.each { |eh| set_event_handler(eh) }
+      end
+
+      def set_event_handler(event_handler)
+        case event_handler.name
+        when :click
+          Event.bind_command(event_handler.name, self, event_handler.options, event_handler.lambda)
+        when :change
+          Event.bind_variable(event_handler.name, self, event_handler.options, event_handler.lambda)
+        else
+          Event.bind_event(event_handler.name, self, event_handler.options, event_handler.lambda)
+        end
       end
     end
 
