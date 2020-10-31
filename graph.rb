@@ -82,7 +82,6 @@ $mouse_y = nil
 
 def mouse_down
   proc do |x, y|
-    binding.pry
     $mouse_x = x
     $mouse_y = y
   end
