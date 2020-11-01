@@ -53,6 +53,7 @@ class GraphComponent < TkComponent::Base
         end
       end
     end
+    @function_grapher.canvas = @function_grapher.canvas.native_item
   end
 
   def draw_graph

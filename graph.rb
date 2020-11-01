@@ -7,8 +7,8 @@ require_relative './function_grapher'
 
 def graph
   fe = FunctionEvaluator.new($function)
-  fg = FunctionGrapher.new(fe, $canvas, $zoom, $x_orig, $y_orig)
-  fg.graph
+  fg = FunctionGrapher.new($canvas, $zoom, $x_orig, $y_orig)
+  fg.graph(fe)
 end
 
 # Main window

@@ -10,15 +10,15 @@ class FunctionGrapher
   end
 
   def graph(function)
-    tk_canvas.delete('all')
+    @canvas.delete('all')
     draw_axes
     cx = 0
     x = y = old_x = old_y = nil
-    max_cx = tk_canvas.winfo_width
+    max_cx = @canvas.winfo_width
     while cx < max_cx do
       x = f_x(cx)
       y = function.evaluate(x: x)
-      TkcLine.new(tk_canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
+      TkcLine.new(@canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
       old_x = x
       old_y = y
       cx += 1
@@ -54,8 +54,8 @@ class FunctionGrapher
   end
 
   def draw_axes
-    TkcLine.new(tk_canvas, c_x(0), 0, c_x(0), tk_canvas.winfo_height, fill: 'blue')
-    TkcLine.new(tk_canvas, 0, c_y(0), tk_canvas.winfo_width, c_y(0), fill: 'blue')
+    TkcLine.new(@canvas, c_x(0), 0, c_x(0), @canvas.winfo_height, fill: 'blue')
+    TkcLine.new(@canvas, 0, c_y(0), @canvas.winfo_width, c_y(0), fill: 'blue')
   end
 
   def min_x
@@ -63,11 +63,11 @@ class FunctionGrapher
   end
 
   def max_x
-    f_x(tk_canvas.winfo_width)
+    f_x(@canvas.winfo_width)
   end
 
   def min_y
-    f_y(tk_canvas.winfo_height)
+    f_y(@canvas.winfo_height)
   end
 
   def max_y
@@ -81,7 +81,7 @@ class FunctionGrapher
   end
 
   def c_y(y)
-    tk_canvas.winfo_height - ((y - y_orig) * zoom)
+    @canvas.winfo_height - ((y - y_orig) * zoom)
   end
 
   # Convert canvas coordinates to function coordinates
@@ -91,10 +91,6 @@ class FunctionGrapher
   end
 
   def f_y(y)
-    (tk_canvas.winfo_height - y) / zoom + y_orig
-  end
-
-  def tk_canvas
-    @canvas.native_item
+    (@canvas.winfo_height - y) / zoom + y_orig
   end
 end
