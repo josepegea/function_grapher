@@ -70,6 +70,21 @@ module TkComponent
         :variable
       end
 
+      delegate :value, to: :tk_variable
+      delegate :"value=", to: :tk_variable
+
+      def i_value
+        value.to_i
+      end
+
+      def f_value
+        value.to_f
+      end
+
+      def s_value
+        value.to_s
+      end
+
       def apply_option(option, value)
         case option.to_sym
         when :value
@@ -79,12 +94,6 @@ module TkComponent
         end
       end
     end
-
-    # class TkLabel < TkItemWithVariable
-    #   def variable_name
-    #     :textvariable
-    #   end
-    # end
 
     class TkLabel < TkItem
     end

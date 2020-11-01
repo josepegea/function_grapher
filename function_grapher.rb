@@ -1,36 +1,61 @@
 class FunctionGrapher
-  attr_accessor :function
   attr_accessor :canvas
-
   attr_accessor :x_orig, :y_orig, :zoom
   
-  def initialize(function, canvas, zoom = 1, x_orig = -100, y_orig = -100)
-    @function = function
+  def initialize(canvas = nil, zoom = 1.0, x_orig = -100.0, y_orig = -100.0)
     @canvas = canvas
     @zoom = zoom
     @x_orig = x_orig
     @y_orig = y_orig
   end
 
-  def graph
-    canvas.delete('all')
+  def graph(function)
+    tk_canvas.delete('all')
     draw_axes
     cx = 0
     x = y = old_x = old_y = nil
-    max_cx = canvas.winfo_width
+    max_cx = tk_canvas.winfo_width
     while cx < max_cx do
       x = f_x(cx)
       y = function.evaluate(x: x)
-      TkcLine.new(canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
+      TkcLine.new(tk_canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
       old_x = x
       old_y = y
       cx += 1
     end
   end
 
+  def zoom_by(factor, options = {})
+    old_center_x = old_center_y = nil
+    if options[:keep_center]
+      old_center_x = min_x + (max_x - min_x) / 2.0
+      old_center_y = min_y + (max_y - min_y) / 2.0
+    end
+    @zoom *= factor
+    center_function(old_center_x, old_center_y) if old_center_x
+  end
+
+  def move_canvas(dx, dy)
+    move_function(f_x(dx) - f_x(0), f_y(dy) - f_y(0))
+  end
+
+  def move_function(dx, dy)
+    @x_orig += dx
+    @y_orig += dy
+  end
+
+  def center_canvas(x, y)
+    center_function(f_x(x), f_y(y))
+  end
+
+  def center_function(x, y)
+    @x_orig = x - ((max_x - min_x) / 2)
+    @y_orig = y - ((max_y - min_y) / 2)
+  end
+
   def draw_axes
-    TkcLine.new(canvas, c_x(0), 0, c_x(0), canvas.winfo_height, fill: 'blue')
-    TkcLine.new(canvas, 0, c_y(0), canvas.winfo_width, c_y(0), fill: 'blue')
+    TkcLine.new(tk_canvas, c_x(0), 0, c_x(0), tk_canvas.winfo_height, fill: 'blue')
+    TkcLine.new(tk_canvas, 0, c_y(0), tk_canvas.winfo_width, c_y(0), fill: 'blue')
   end
 
   def min_x
@@ -38,15 +63,15 @@ class FunctionGrapher
   end
 
   def max_x
-    f_x(canvas.winfo_width)
+    f_x(tk_canvas.winfo_width)
   end
 
   def min_y
-    f_y(0)
+    f_y(tk_canvas.winfo_height)
   end
 
   def max_y
-    f_y(canvas.winfo_height)
+    f_y(0)
   end
 
   # Convert function coordinates to canvas coordinates
@@ -56,7 +81,7 @@ class FunctionGrapher
   end
 
   def c_y(y)
-    canvas.winfo_height - ((y - y_orig) * zoom)
+    tk_canvas.winfo_height - ((y - y_orig) * zoom)
   end
 
   # Convert canvas coordinates to function coordinates
@@ -66,6 +91,10 @@ class FunctionGrapher
   end
 
   def f_y(y)
-    y / zoom + y_orig
+    (tk_canvas.winfo_height - y) / zoom + y_orig
+  end
+
+  def tk_canvas
+    @canvas.native_item
   end
 end

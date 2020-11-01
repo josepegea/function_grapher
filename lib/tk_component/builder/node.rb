@@ -9,6 +9,13 @@ module TkComponent
       attr_accessor :event_handlers
       attr_accessor :tk_item
 
+      delegate :value, to: :tk_item
+      delegate :"value=", to: :tk_item
+      delegate :i_value, to: :tk_item
+      delegate :f_value, to: :tk_item
+      delegate :s_value, to: :tk_item
+      delegate :native_item, to: :tk_item
+
       def initialize(name, options = {})
         @name = name
         @options = options

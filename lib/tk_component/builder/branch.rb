@@ -44,11 +44,14 @@ module TkComponent
           builder = self.class.new(method_name, *args)
           yield(builder)
           add_node(builder)
+          return builder
         else
           if method_name.to_s.match(/^on_(.*)/)
             add_event_handler($1, *args)
           else
-            add_node(Leaf.new(method_name, *args))
+            builder = Leaf.new(method_name, *args)
+            add_node(builder)
+            return builder
           end
         end
       end

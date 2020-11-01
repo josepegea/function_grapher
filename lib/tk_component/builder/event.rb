@@ -21,14 +21,14 @@ module TkComponent
 
       def self.bind_command(name, sender, options, lambda)
         sender.native_item.command do
-          event = self.new(name, self)
+          event = self.new(name, sender)
           lambda.call(event)
         end
       end
 
       def self.bind_variable(name, sender, options, lambda)
         handler = proc do
-          event = self.new(name, self)
+          event = self.new(name, sender)
           lambda.call(event)
         end
         sender.tk_variable.trace('write', handler)
@@ -37,7 +37,7 @@ module TkComponent
       def self.bind_event(name, sender, options, lambda)
         event_string = self.event_string_for(name, options)
         handler = proc do |x, y, rx, ry, bi, mw, ks, kc|
-          event = self.new(name, self)
+          event = self.new(name, sender)
           event.mouse_x = x
           event.mouse_y = y
           event.root_mouse_x = rx
