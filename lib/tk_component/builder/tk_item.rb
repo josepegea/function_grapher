@@ -57,7 +57,32 @@ module TkComponent
       end
     end
 
+    module ValueTyping
+      def apply_option(option, v)
+        case option.to_sym
+        when :value
+          self.value = v
+        else
+          super
+        end
+      end
+
+      def i_value
+        value.to_i
+      end
+
+      def f_value
+        value.to_f
+      end
+
+      def s_value
+        value.to_s
+      end
+    end
+
     class TkItemWithVariable < TkItem
+      include ValueTyping
+
       attr_accessor :tk_variable
 
       def initialize(parent_item, name, options = {}, grid = {}, event_handlers = [])
@@ -72,35 +97,43 @@ module TkComponent
 
       delegate :value, to: :tk_variable
       delegate :"value=", to: :tk_variable
-
-      def i_value
-        value.to_i
-      end
-
-      def f_value
-        value.to_f
-      end
-
-      def s_value
-        value.to_s
-      end
-
-      def apply_option(option, value)
-        case option.to_sym
-        when :value
-          self.tk_variable.value = value
-        else
-          super
-        end
-      end
-    end
-
-    class TkLabel < TkItem
     end
 
     class TkEntry < TkItemWithVariable
       def variable_name
         :textvariable
+      end
+    end
+
+    class TkText < TkItem
+      include ValueTyping
+
+      def value
+        native_item.get('1.0', 'end')
+      end
+
+      def value=(text)
+        native_item.replace('1.0', 'end', text)
+      end
+
+      def set_event_handler(event_handler)
+        case event_handler.name
+        when :change
+          pre_lambda = ->(e) do
+            # Prevent the event if the text wasn't really modified
+            # This is because setting "modified = false" triggers
+            # the modification event itself, which makes not much sense.
+            e.sender.is_a?(self.class) && !e.sender.native_item.modified?
+          end
+          post_lambda = ->(e) do
+            if e.sender.is_a?(self.class)
+              e.sender.native_item.modified = false
+            end
+          end
+          Event.bind_event('<Modified>', self, event_handler.options, event_handler.lambda, pre_lambda, post_lambda)
+        else
+          super
+        end
       end
     end
 
@@ -119,7 +152,8 @@ module TkComponent
       label: Tk::Tile::Label,
       entry: Tk::Tile::Entry,
       button: Tk::Tile::Button,
-      canvas: Tk::Canvas
+      canvas: Tk::Canvas,
+      text: ::TkText
     }
 
     ITEM_CLASSES = {
@@ -127,10 +161,11 @@ module TkComponent
       frame: TkComponent::Builder::TkItem,
       hframe: TkComponent::Builder::TkItem,
       vframe: TkComponent::Builder::TkItem,
-      label: TkComponent::Builder::TkLabel,
+      label: TkComponent::Builder::TkItem,
       entry: TkComponent::Builder::TkEntry,
       button: TkComponent::Builder::TkItem,
-      canvas: TkComponent::Builder::TkItem
+      canvas: TkComponent::Builder::TkItem,
+      text: TkComponent::Builder::TkText
     }
   end
 end

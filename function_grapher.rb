@@ -12,17 +12,13 @@ class FunctionGrapher
   def graph(function)
     @canvas.delete('all')
     draw_axes
-    cx = 0
-    x = y = old_x = old_y = nil
-    max_cx = @canvas.winfo_width
-    while cx < max_cx do
+    points = []
+    (0..@canvas.winfo_width).each do |cx|
       x = f_x(cx)
       y = function.evaluate(x: x)
-      TkcLine.new(@canvas, c_x(old_x), c_y(old_y), c_x(x), c_y(y)) if old_x && old_y
-      old_x = x
-      old_y = y
-      cx += 1
+      points += [c_x(x), c_y(y)]
     end
+    TkcLine.new(@canvas, *points)
   end
 
   def zoom_by(factor, options = {})

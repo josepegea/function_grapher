@@ -17,9 +17,12 @@ class GraphComponent < TkComponent::Base
     parent.parse_component do |p|
       p.frame(padding: "3 3 12 12", sticky: 'nsew', h_weight: 1, v_weight: 1) do |f|
         f.row do |r|
-          r.vframe(rowspan: 2, sticky: 'n', padding: "0") do |vf|
-            vf.label(text: "Function: ")
-            vf.entry(width: 20, value: @function, sticky: 'wns') do |en|
+          r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
+            vf.label(text: "Function: ", sticky: "w")
+            @text = vf.text(width: 20, height: 5,
+                            font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
+                            highlightthickness: 0,
+                            value: @function, sticky: 'wns') do |en|
               en.on_change ->(e) { @function = e.sender.s_value }
             end
           end

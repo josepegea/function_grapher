@@ -34,7 +34,7 @@ module TkComponent
         sender.tk_variable.trace('write', handler)
       end
 
-      def self.bind_event(name, sender, options, lambda)
+      def self.bind_event(name, sender, options, lambda, pre_lambda = nil, post_lambda = nil)
         event_string = self.event_string_for(name, options)
         handler = proc do |x, y, rx, ry, bi, mw, ks, kc|
           event = self.new(name, sender)
@@ -46,7 +46,10 @@ module TkComponent
           event.mouse_wheel_delta = mw
           event.key_string = ks
           event.key_code = kc
+          # The pre_lambda returns true if it wants to prevent the event from firing
+          return if pre_lambda.present? && pre_lambda.call(event)
           lambda.call(event)
+          post_lambda.call(event) if post_lambda.present?
         end
         sender.native_item.bind(event_string, handler, EVENT_ATTRS)
       end
