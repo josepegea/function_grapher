@@ -7,6 +7,8 @@ class GraphComponent < TkComponent::Base
 
   attr_accessor :function, :function_grapher
   attr_accessor :zoom_w, :x_orig_w, :y_orig_w
+  attr_accessor :param_a
+  attr_accessor :param_b
 
   def initialize
     @function = "10 * Math.sin(x / 10)"
@@ -19,11 +21,17 @@ class GraphComponent < TkComponent::Base
         f.row do |r|
           r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
             vf.label(text: "Function: ", sticky: "w")
-            @text = vf.text(width: 20, height: 5,
-                            font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
-                            highlightthickness: 0,
-                            value: @function, sticky: 'wns') do |en|
+            vf.text(width: 20, height: 5,
+                    font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
+                    highlightthickness: 0,
+                    value: @function, sticky: 'wns') do |en|
               en.on_change ->(e) { @function = e.sender.s_value }
+            end
+            [:a, :b].each do |p|
+              vf.label(text: "#{p.to_s.upcase}: ", sticky: "w")
+              vf.scale(orient: 'horizontal', from: 0, to: 100, sticky: 'ew') do |s|
+                s.on_change ->(e) { self.send("param_#{p.to_s}=",  e.sender.f_value); draw_graph }
+              end
             end
           end
           @function_grapher.canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', h_weight: 1, v_weight: 1) do |cv|
@@ -64,7 +72,7 @@ class GraphComponent < TkComponent::Base
     @zoom_w.value = @function_grapher.zoom
     @x_orig_w.value = @function_grapher.x_orig
     @y_orig_w.value = @function_grapher.y_orig
-    @function_grapher.graph(fe)
+    @function_grapher.graph(fe, a: @param_a, b: @param_b)
   end
 
   def mousewheel(event)

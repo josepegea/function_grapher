@@ -105,6 +105,21 @@ module TkComponent
       end
     end
 
+    class TkScale < TkItemWithVariable
+      def variable_name
+        :variable
+      end
+
+      def set_event_handler(event_handler)
+        case event_handler.name
+        when :change
+          Event.bind_command(event_handler.name, self, event_handler.options, event_handler.lambda)
+        else
+          super
+        end
+      end
+    end
+
     class TkText < TkItem
       include ValueTyping
 
@@ -153,7 +168,8 @@ module TkComponent
       entry: Tk::Tile::Entry,
       button: Tk::Tile::Button,
       canvas: Tk::Canvas,
-      text: ::TkText
+      text: ::TkText,
+      scale: Tk::Tile::Scale
     }
 
     ITEM_CLASSES = {
@@ -165,7 +181,8 @@ module TkComponent
       entry: TkComponent::Builder::TkEntry,
       button: TkComponent::Builder::TkItem,
       canvas: TkComponent::Builder::TkItem,
-      text: TkComponent::Builder::TkText
+      text: TkComponent::Builder::TkText,
+      scale: TkComponent::Builder::TkScale
     }
   end
 end

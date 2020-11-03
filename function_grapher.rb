@@ -9,13 +9,13 @@ class FunctionGrapher
     @y_orig = y_orig
   end
 
-  def graph(function)
+  def graph(function, vars = {})
     @canvas.delete('all')
     draw_axes
     points = []
     (0..@canvas.winfo_width).each do |cx|
       x = f_x(cx)
-      y = function.evaluate(x: x)
+      y = function.evaluate(vars.merge x: x)
       points += [c_x(x), c_y(y)]
     end
     TkcLine.new(@canvas, *points)
