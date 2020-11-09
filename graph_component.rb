@@ -16,6 +16,8 @@ class GraphComponent < TkComponent::Base
     super
     @function = "10 * Math.sin(x / 10)"
     @function_grapher = FunctionGrapher.new
+    @param_a = 1.0
+    @param_b = 1.0
   end
 
   def generate(parent_component, options = {})

@@ -176,7 +176,8 @@ module TkComponent
       button: Tk::Tile::Button,
       canvas: Tk::Canvas,
       text: ::TkText,
-      scale: Tk::Tile::Scale
+      scale: Tk::Tile::Scale,
+      group: Tk::Tile::LabelFrame
     }
 
     ITEM_CLASSES = {
@@ -189,7 +190,8 @@ module TkComponent
       button: TkComponent::Builder::TkItem,
       canvas: TkComponent::Builder::TkItem,
       text: TkComponent::Builder::TkText,
-      scale: TkComponent::Builder::TkScale
+      scale: TkComponent::Builder::TkScale,
+      group: TkComponent::Builder::TkItem
     }
   end
 end
