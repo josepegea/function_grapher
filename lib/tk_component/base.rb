@@ -6,25 +6,47 @@ module TkComponent
 
     attr_accessor :tk_item
     attr_accessor :parent
+    attr_accessor :parent_node
     attr_accessor :children
+    attr_accessor :node
 
     def initialize(options = {})
       @parent = options[:parent]
+      @parent_node = options[:parent_node]
       @children = []
     end
 
-    def parse_component(options = {})
+    def parse_component(parent_component, options = {})
       raise "You need to provide a block" unless block_given?
-      builder = Builder::Branch.new(:top, options)
-      builder.tk_item = tk_item
-      yield(builder)
-      builder.prepare_grid
-      add_child(builder.build(self))
+      @node = Builder::Node.new(:top, options)
+      yield(@node)
+      binding.pry if @node.sub_nodes.size != 1
+      raise "Components need to have a single root node" unless @node.sub_nodes.size == 1
+      @node.prepare_grid
+      @node = @node.sub_nodes.first # Get rid of the dummy top node
     end
 
-    private
+    def build(parent_component)
+      @node.build(@parent_node, parent_component)
+      component_did_build
+      children.each do |c|
+        c.build(self)
+      end
+    end
+
+    def name
+      self.class.name
+    end
+
+    def emit(event_name)
+      TkComponent::Builder::Event.emit('ParamChanged', parent_node.native_item, self.object_id)
+    end
+
+    def component_did_build
+    end
 
     def add_child(child)
+      binding.pry if children.nil?
       children << child
     end
   end

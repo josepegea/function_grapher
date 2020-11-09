@@ -67,6 +67,10 @@ module TkComponent
         end
       end
 
+      def update_value(v)
+        self.value = v if value.to_s != v.to_s
+      end
+
       def i_value
         value.to_i
       end
@@ -109,6 +113,9 @@ module TkComponent
       def variable_name
         :variable
       end
+
+      delegate :from, to: :native_item
+      delegate :to, to: :native_item
 
       def set_event_handler(event_handler)
         case event_handler.name

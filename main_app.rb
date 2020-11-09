@@ -7,6 +7,6 @@ require_relative 'graph_component'
 root = TkComponent::Window.new(title: "Graph!!")
 
 app = GraphComponent.new
-app.generate(root)
+root.place_root_component(app)
 
 Tk.mainloop

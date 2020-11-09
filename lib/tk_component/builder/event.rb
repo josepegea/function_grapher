@@ -11,12 +11,17 @@ module TkComponent
       attr_accessor :root_mouse_x
       attr_accessor :root_mouse_y
       attr_accessor :mouse_wheel_delta
+      attr_accessor :data
 
-      EVENT_ATTRS = "%x %y %X %Y %b %D %A %k"
+      EVENT_ATTRS = "%x %y %X %Y %b %D %A %k %d"
 
       def initialize(name, sender)
         @name = name.to_sym
         @sender = sender
+      end
+
+      def self.emit(name, source, data)
+        Tk.event_generate(source, "<#{name}>", data: data)
       end
 
       def self.bind_command(name, sender, options, lambda)
@@ -36,7 +41,7 @@ module TkComponent
 
       def self.bind_event(name, sender, options, lambda, pre_lambda = nil, post_lambda = nil)
         event_string = self.event_string_for(name, options)
-        handler = proc do |x, y, rx, ry, bi, mw, ks, kc|
+        handler = proc do |x, y, rx, ry, bi, mw, ks, kc, data|
           event = self.new(name, sender)
           event.mouse_x = x
           event.mouse_y = y
@@ -46,6 +51,7 @@ module TkComponent
           event.mouse_wheel_delta = mw
           event.key_string = ks
           event.key_code = kc
+          event.data = data
           # The pre_lambda returns true if it wants to prevent the event from firing
           return if pre_lambda.present? && pre_lambda.call(event)
           lambda.call(event)

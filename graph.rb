@@ -9,6 +9,7 @@ def graph
   fe = FunctionEvaluator.new($function)
   fg = FunctionGrapher.new($canvas, $zoom, $x_orig, $y_orig)
   fg.graph(fe)
+  emit_custom_event
 end
 
 # Main window
@@ -25,6 +26,10 @@ left_bar = Tk::Tile::Frame.new(content) {padding "0"}.grid(column: 1, row: 1, ro
 Tk::Tile::Label.new(left_bar) {text 'Function:'}.grid(column: 1, row: 1)
 $function = TkVariable.new("100 * Math.sin(x*0.05)")
 function_t = Tk::Tile::Entry.new(left_bar) {width 20; textvariable $function}.grid(column: 1, row: 2)
+
+$text = TkText.new(left_bar) { width 20; height 20 }.grid(column: 1, row: 3)
+$text.bind("<Modified>", ->(x,y) { puts(x,y) }, '%x %y')
+
 
 TkGrid.columnconfigure left_bar, 1, weight: 1
 TkGrid.rowconfigure left_bar, 1, weight: 0
@@ -115,6 +120,13 @@ end
 $canvas.bind("MouseWheel", mousewheel, '%D')
 $canvas.bind("B1-Motion", mouse_drag, '%x %y')
 $canvas.bind("B1-ButtonRelease", mouse_up, '%x %y')
+
+# Virtual events
+$canvas.bind("<FunctionUpdated>", proc { |e| puts "FunctionUpdated #{e}" }, '%D')
+
+def emit_custom_event
+  Tk.event_generate($canvas, "<FunctionUpdated>")
+end
 
 # Turn everything on!!
 Tk.mainloop

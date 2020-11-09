@@ -3,6 +3,8 @@ require_relative 'lib/tk_component'
 require_relative './function_evaluator'
 require_relative './function_grapher'
 
+require_relative 'param_component'
+
 class GraphComponent < TkComponent::Base
 
   attr_accessor :function, :function_grapher
@@ -11,12 +13,13 @@ class GraphComponent < TkComponent::Base
   attr_accessor :param_b
 
   def initialize
+    super
     @function = "10 * Math.sin(x / 10)"
     @function_grapher = FunctionGrapher.new
   end
 
-  def generate(parent)
-    parent.parse_component do |p|
+  def generate(parent_component, options = {})
+    parse_component(parent_component, options) do |p|
       p.frame(padding: "3 3 12 12", sticky: 'nsew', h_weight: 1, v_weight: 1) do |f|
         f.row do |r|
           r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
@@ -24,13 +27,22 @@ class GraphComponent < TkComponent::Base
             vf.text(width: 20, height: 5,
                     font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
                     highlightthickness: 0,
-                    value: @function, sticky: 'wns') do |en|
+                    value: @function, sticky: 'wens') do |en|
               en.on_change ->(e) { @function = e.sender.s_value }
             end
-            [:a, :b].each do |p|
-              vf.label(text: "#{p.to_s.upcase}: ", sticky: "w")
-              vf.scale(orient: 'horizontal', from: 0, to: 100, sticky: 'ew') do |s|
-                s.on_change ->(e) { self.send("param_#{p.to_s}=",  e.sender.f_value); draw_graph }
+            vf.vframe do |vvf|
+              [:a, :b].each do |p|
+                vvf.insert_component(ParamComponent,
+                                    self,
+                                    name: p.to_s,
+                                    value: 0.0,
+                                    min: 0.0,
+                                    max: 1.0) do |pc|
+                  pc.on_event 'ParamChanged', ->(e) do
+                    param = ObjectSpace._id2ref(e.data.to_i)
+                    self.send("param_#{param.name}=",  param.value); draw_graph
+                  end
+                end
               end
             end
           end
@@ -64,6 +76,9 @@ class GraphComponent < TkComponent::Base
         end
       end
     end
+  end
+
+  def component_did_build
     @function_grapher.canvas = @function_grapher.canvas.native_item
   end
 
