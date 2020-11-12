@@ -60,6 +60,15 @@ module TkComponent
         sender.native_item.bind(event_string, handler, EVENT_ATTRS)
       end
 
+      def data_object
+        @data_object ||= begin
+                           ObjectSpace._id2ref(self.data.to_i)
+                         rescue
+                           nil
+                         end
+      end
+
+      private
 
       def self.event_string_for(name, options)
         event_name = self.resolve_event_alias(name).to_s.camelize

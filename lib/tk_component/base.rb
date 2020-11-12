@@ -22,6 +22,7 @@ module TkComponent
       yield(@node)
       binding.pry if @node.sub_nodes.size != 1
       raise "Components need to have a single root node" unless @node.sub_nodes.size == 1
+      @node.prepare_option_events(self)
       @node.prepare_grid
       @node = @node.sub_nodes.first # Get rid of the dummy top node
     end

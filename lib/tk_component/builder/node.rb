@@ -27,7 +27,7 @@ module TkComponent
 
       def initialize(name, options = {})
         @name = name
-        @options = options
+        @options = options.with_indifferent_access
         @sub_nodes = []
         @grid = {}
         @grid_map = GridMap.new
@@ -62,6 +62,15 @@ module TkComponent
           n.build(self, parent_component)
         end
         self.tk_item.apply_internal_grid(grid_map)
+      end
+
+      def prepare_option_events(component)
+        option_events = options.extract!(*EVENT_CMDS)
+        option_events.each do |k, v|
+          event_proc = v.is_a?(Proc) ? v : proc { |e| component.public_send(v, e) }
+          node_from_command(k, event_proc)
+        end
+        sub_nodes.each { |n| n.prepare_option_events(component) }
       end
 
       def prepare_grid

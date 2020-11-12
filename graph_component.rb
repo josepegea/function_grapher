@@ -41,7 +41,7 @@ class GraphComponent < TkComponent::Base
                                     min: 0.0,
                                     max: 1.0) do |pc|
                   pc.on_event 'ParamChanged', ->(e) do
-                    param = ObjectSpace._id2ref(e.data.to_i)
+                    param = e.data_object
                     self.send("param_#{param.name}=",  param.value); draw_graph
                   end
                 end
@@ -71,9 +71,7 @@ class GraphComponent < TkComponent::Base
             hf.button(text: "Origin!") do |b|
               b.on_click ->(e) { @function_grapher.center_function(0, 0); draw_graph }
             end
-            hf.button(text: "Graph!", default: "active") do |b|
-              b.on_click ->(e) { draw_graph }
-            end
+            hf.button(text: "Graph!", default: "active", on_click: :draw_graph)
           end
         end
       end
@@ -84,7 +82,7 @@ class GraphComponent < TkComponent::Base
     @function_grapher.canvas = @function_grapher.canvas.native_item
   end
 
-  def draw_graph
+  def draw_graph(e = nil)
     fe = FunctionEvaluator.new(@function)
     @zoom_w.value = @function_grapher.zoom
     @x_orig_w.value = @function_grapher.x_orig
