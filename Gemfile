@@ -6,3 +6,5 @@ gem 'tk'
 gem 'pry'
 gem 'pry-byebug'
 gem 'activesupport'
+gem 'rspec'
+

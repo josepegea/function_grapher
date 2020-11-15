@@ -35,6 +35,19 @@ module TkComponent
       end
     end
 
+    def regenerate
+      old_node = @node
+      generate(parent)
+      rebuild(old_node)
+      children.each do |c|
+        c.regenerate
+      end
+    end
+
+    def rebuild(old_node)
+      build(parent)
+    end
+
     def name
       self.class.name
     end

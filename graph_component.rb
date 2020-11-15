@@ -9,15 +9,13 @@ class GraphComponent < TkComponent::Base
 
   attr_accessor :function, :function_grapher
   attr_accessor :zoom_w, :x_orig_w, :y_orig_w
-  attr_accessor :param_a
-  attr_accessor :param_b
+  attr_accessor :params
 
   def initialize
     super
     @function = "10 * Math.sin(x / 10)"
     @function_grapher = FunctionGrapher.new
-    @param_a = 1.0
-    @param_b = 1.0
+    @params = {}
   end
 
   def generate(parent_component, options = {})
@@ -32,17 +30,19 @@ class GraphComponent < TkComponent::Base
                     value: @function, sticky: 'wens') do |en|
               en.on_change ->(e) { @function = e.sender.s_value }
             end
+            vf.button(text: "Update params", on_click: :update_params)
             vf.vframe do |vvf|
-              [:a, :b].each do |p|
+              @params.each do |k, v|
                 vvf.insert_component(ParamComponent,
                                     self,
-                                    name: p.to_s,
-                                    value: 0.0,
+                                    name: k.to_s,
+                                    value: v || 0.0,
                                     min: 0.0,
                                     max: 1.0) do |pc|
                   pc.on_event 'ParamChanged', ->(e) do
                     param = e.data_object
-                    self.send("param_#{param.name}=",  param.value); draw_graph
+                    params[param.name.to_sym] = param.value
+                    draw_graph
                   end
                 end
               end
@@ -87,7 +87,19 @@ class GraphComponent < TkComponent::Base
     @zoom_w.value = @function_grapher.zoom
     @x_orig_w.value = @function_grapher.x_orig
     @y_orig_w.value = @function_grapher.y_orig
-    @function_grapher.graph(fe, a: @param_a, b: @param_b)
+    @function_grapher.graph(fe, params)
+  end
+
+  def update_params(e = nil)
+    fe = FunctionEvaluator.new(@function)
+    puts("Found params: #{fe.find_params}")
+    puts ("Current params: #{params}")
+    new_params = fe.find_params - [:x]
+    old_params = params.keys
+    (old_params - new_params).each { |p| params.delete(p) }
+    (new_params - old_params).each { |p| params[p] = 0.0 }
+    puts ("New params: #{params}")
+    regenerate
   end
 
   def mousewheel(event)
