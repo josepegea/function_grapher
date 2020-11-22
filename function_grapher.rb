@@ -16,6 +16,7 @@ class FunctionGrapher
     (0..@canvas.winfo_width).each do |cx|
       x = f_x(cx)
       y = function.evaluate(vars.merge x: x)
+      next if y.is_a?(Complex)
       points += [c_x(x), c_y(y)]
     end
     TkcLine.new(@canvas, *points)
