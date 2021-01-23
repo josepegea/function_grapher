@@ -1,4 +1,4 @@
-require_relative 'lib/tk_component'
+require 'tk_component'
 
 class ParamComponent < TkComponent::Base
   attr_accessor :name, :value, :min, :max
@@ -15,21 +15,21 @@ class ParamComponent < TkComponent::Base
     parse_component(parent_component, options) do |p|
       p.group do |g|
         g.vframe do |vf|
-          vf.hframe(sticky: "ew", h_weight: 1) do |hf|
+          vf.hframe(sticky: "ew", x_flex: 1) do |hf|
             hf.label(text: "Param: ")
             hf.label(text: name, font: 'TkCaptionFont')
-            @value_w = hf.entry(value: @value, width: 8, sticky: 'e', v_weight: 1) do |e|
+            @value_w = hf.entry(value: @value, width: 8, sticky: 'e', y_flex: 1) do |e|
               e.on_change ->(e) { @value = e.sender.f_value; update }
             end
           end
-          vf.hframe(sticky: "ew", h_weight: 1) do |hf|
-            @min_w = hf.entry(value: @min, font: 'TkSmallCaptionFont', width: 4, sticky: 'w', v_weight: 1) do |e|
+          vf.hframe(sticky: "ew", x_flex: 1) do |hf|
+            @min_w = hf.entry(value: @min, font: 'TkSmallCaptionFont', width: 4, sticky: 'w', y_flex: 1) do |e|
               e.on_change ->(e) { @min = e.sender.f_value; update }
             end
-            @scale_w = hf.scale(orient: 'horizontal', from: @min, to: @max, h_weight: 1) do |s|
+            @scale_w = hf.scale(orient: 'horizontal', from: @min, to: @max, x_flex: 1) do |s|
               s.on_change ->(e) { @value = e.sender.f_value; update }
             end
-            @max_w = hf.entry(value: @max, font: 'TkSmallCaptionFont', width: 4, sticky: 'e', v_weight: 1) do |e|
+            @max_w = hf.entry(value: @max, font: 'TkSmallCaptionFont', width: 4, sticky: 'e', y_flex: 1) do |e|
               e.on_change ->(e) { @max = e.sender.f_value; update }
             end
           end

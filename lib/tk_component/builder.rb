@@ -1,5 +1,0 @@
-require_relative 'builder/node'
-require_relative 'builder/grid_map'
-require_relative 'builder/event'
-require_relative 'builder/event_handler'
-require_relative 'builder/tk_item'

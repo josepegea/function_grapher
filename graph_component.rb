@@ -1,4 +1,4 @@
-require_relative 'lib/tk_component'
+require 'tk_component'
 
 require_relative './function_evaluator'
 require_relative './function_grapher'
@@ -13,14 +13,14 @@ class GraphComponent < TkComponent::Base
 
   def initialize
     super
-    @function = "10 * Math.sin(x / 10)"
+    @function = "Math.sin(x)"
     @function_grapher = FunctionGrapher.new
     @params = {}
   end
 
   def generate(parent_component, options = {})
     parse_component(parent_component, options) do |p|
-      p.frame(padding: "3 3 12 12", sticky: 'nsew', h_weight: 1, v_weight: 1) do |f|
+      p.frame(padding: "3 3 12 12", sticky: 'nsew', x_flex: 1, y_flex: 1) do |f|
         f.row do |r|
           r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
             vf.label(text: "Function: ", sticky: "w")
@@ -48,7 +48,7 @@ class GraphComponent < TkComponent::Base
               end
             end
           end
-          @function_grapher.canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', h_weight: 1, v_weight: 1) do |cv|
+          @function_grapher.canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', x_flex: 1, y_flex: 1) do |cv|
             cv.on_mouse_wheel ->(e) { mousewheel(e) }
             cv.on_mouse_drag ->(e) { mouse_drag(e) }, button: 1
             cv.on_mouse_up ->(e) { mouse_up(e) }, button: 1
@@ -57,15 +57,15 @@ class GraphComponent < TkComponent::Base
         f.row do |r|
           r.hframe(sticky: "e") do |hf|
             hf.label(text: "Zoom: ")
-            @zoom_w = hf.entry(value: @function_grapher.zoom) do |en|
+            @zoom_w = hf.entry(value: @function_grapher.zoom, width: 6) do |en|
               en.on_change ->(e) { @function_grapher.zoom = e.sender.f_value }
             end
             hf.label(text: "Left X: ")
-            @x_orig_w = hf.entry(value: @function_grapher.x_orig) do |en|
+            @x_orig_w = hf.entry(value: @function_grapher.x_orig, width: 6) do |en|
               en.on_change ->(e) { @function_grapher.x_orig = e.sender.f_value }
             end
             hf.label(text: "Bottom Y: ")
-            @y_orig_w = hf.entry(value: @function_grapher.y_orig) do |en|
+            @y_orig_w = hf.entry(value: @function_grapher.y_orig, width: 6) do |en|
               en.on_change ->(e) { @function_grapher.y_orig = e.sender.f_value }
             end
             hf.button(text: "Origin!") do |b|
