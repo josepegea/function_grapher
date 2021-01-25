@@ -9,18 +9,27 @@ class FunctionGrapher
     @y_orig = y_orig
   end
 
+  # Drawing functions
+
+  def draw_axes
+    TkcLine.new(@canvas, f2c_x(0), 0, f2c_x(0), @canvas.winfo_height, fill: 'blue')
+    TkcLine.new(@canvas, 0, f2c_y(0), @canvas.winfo_width, f2c_y(0), fill: 'blue')
+  end
+
   def graph(function, vars = {})
     @canvas.delete('all')
     draw_axes
     points = []
     (0..@canvas.winfo_width).each do |cx|
-      x = f_x(cx)
+      x = c2f_x(cx)
       y = function.evaluate(vars.merge x: x)
       next if y.is_a?(Complex)
-      points += [c_x(x), c_y(y)]
+      points += [f2c_x(x), f2c_y(y)]
     end
     TkcLine.new(@canvas, *points)
   end
+
+  # Zooming and panning
 
   def zoom_by(factor, options = {})
     old_center_x = old_center_y = nil
@@ -33,7 +42,7 @@ class FunctionGrapher
   end
 
   def move_canvas(dx, dy)
-    move_function(f_x(dx) - f_x(0), f_y(dy) - f_y(0))
+    move_function(c2f_x(dx) - c2f_x(0), c2f_y(dy) - c2f_y(0))
   end
 
   def move_function(dx, dy)
@@ -42,7 +51,7 @@ class FunctionGrapher
   end
 
   def center_canvas(x, y)
-    center_function(f_x(x), f_y(y))
+    center_function(c2f_x(x), c2f_y(y))
   end
 
   def center_function(x, y)
@@ -50,44 +59,41 @@ class FunctionGrapher
     @y_orig = y - ((max_y - min_y) / 2)
   end
 
-  def draw_axes
-    TkcLine.new(@canvas, c_x(0), 0, c_x(0), @canvas.winfo_height, fill: 'blue')
-    TkcLine.new(@canvas, 0, c_y(0), @canvas.winfo_width, c_y(0), fill: 'blue')
-  end
+  # Get function bounds for current canvas, position and zoom
 
   def min_x
-    f_x(0)
+    c2f_x(0)
   end
 
   def max_x
-    f_x(@canvas.winfo_width)
+    c2f_x(@canvas.winfo_width)
   end
 
   def min_y
-    f_y(@canvas.winfo_height)
+    c2f_y(@canvas.winfo_height)
   end
 
   def max_y
-    f_y(0)
+    c2f_y(0)
   end
 
   # Convert function coordinates to canvas coordinates
 
-  def c_x(x)
+  def f2c_x(x)
     (x - x_orig) * zoom
   end
 
-  def c_y(y)
+  def f2c_y(y)
     @canvas.winfo_height - ((y - y_orig) * zoom)
   end
 
   # Convert canvas coordinates to function coordinates
 
-  def f_x(x)
+  def c2f_x(x)
     x / zoom + x_orig
   end
 
-  def f_y(y)
+  def c2f_y(y)
     (@canvas.winfo_height - y) / zoom + y_orig
   end
 end
