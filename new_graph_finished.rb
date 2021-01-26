@@ -1,7 +1,5 @@
-require 'pry'
-require 'tk'
-require 'tkextlib/tile'
 require 'tk_component'
+
 require_relative 'function_grapher'
 require_relative 'function_evaluator'
 

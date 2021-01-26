@@ -1,14 +1,13 @@
 require 'tk_component'
 
-require_relative './function_evaluator'
-require_relative './function_grapher'
+require_relative 'function_grapher'
+require_relative 'function_evaluator'
 
 require_relative 'param_component'
 
 class GraphComponent < TkComponent::Base
 
   attr_accessor :function, :function_grapher
-  attr_accessor :zoom_w, :x_orig_w, :y_orig_w
   attr_accessor :params
 
   def initialize
@@ -20,7 +19,7 @@ class GraphComponent < TkComponent::Base
 
   def generate(parent_component, options = {})
     parse_component(parent_component, options) do |p|
-      p.frame(padding: "3 3 12 12", sticky: 'nsew', x_flex: 1, y_flex: 1) do |f|
+      p.frame(padding: "8", sticky: 'nsew', x_flex: 1, y_flex: 1) do |f|
         f.row do |r|
           r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
             vf.label(text: "Function: ", sticky: "w")
@@ -48,7 +47,7 @@ class GraphComponent < TkComponent::Base
               end
             end
           end
-          @function_grapher.canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', x_flex: 1, y_flex: 1) do |cv|
+          @canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', x_flex: 1, y_flex: 1) do |cv|
             cv.on_mouse_wheel ->(e) { mousewheel(e) }
             cv.on_mouse_drag ->(e) { mouse_drag(e) }, button: 1
             cv.on_mouse_up ->(e) { mouse_up(e) }, button: 1
@@ -56,18 +55,6 @@ class GraphComponent < TkComponent::Base
         end
         f.row do |r|
           r.hframe(sticky: "e") do |hf|
-            hf.label(text: "Zoom: ")
-            @zoom_w = hf.entry(value: @function_grapher.zoom, width: 6) do |en|
-              en.on_change ->(e) { @function_grapher.zoom = e.sender.f_value }
-            end
-            hf.label(text: "Left X: ")
-            @x_orig_w = hf.entry(value: @function_grapher.x_orig, width: 6) do |en|
-              en.on_change ->(e) { @function_grapher.x_orig = e.sender.f_value }
-            end
-            hf.label(text: "Bottom Y: ")
-            @y_orig_w = hf.entry(value: @function_grapher.y_orig, width: 6) do |en|
-              en.on_change ->(e) { @function_grapher.y_orig = e.sender.f_value }
-            end
             hf.button(text: "Origin!") do |b|
               b.on_click ->(e) { @function_grapher.center_function(0, 0); draw_graph }
             end
@@ -79,27 +66,21 @@ class GraphComponent < TkComponent::Base
   end
 
   def component_did_build
-    @function_grapher.canvas = @function_grapher.canvas.native_item
-  end
-
-  def draw_graph(e = nil)
-    fe = FunctionEvaluator.new(@function)
-    @zoom_w.value = @function_grapher.zoom
-    @x_orig_w.value = @function_grapher.x_orig
-    @y_orig_w.value = @function_grapher.y_orig
-    @function_grapher.graph(fe, params)
+    @function_grapher.canvas = @canvas.native_item
   end
 
   def update_params(e = nil)
     fe = FunctionEvaluator.new(@function)
-    puts("Found params: #{fe.find_params}")
-    puts ("Current params: #{params}")
     new_params = fe.find_params - [:x]
     old_params = params.keys
     (old_params - new_params).each { |p| params.delete(p) }
     (new_params - old_params).each { |p| params[p] = 0.0 }
-    puts ("New params: #{params}")
     regenerate
+  end
+
+  def draw_graph(e = nil)
+    fe = FunctionEvaluator.new(@function)
+    @function_grapher.graph(fe, params)
   end
 
   def mousewheel(event)
