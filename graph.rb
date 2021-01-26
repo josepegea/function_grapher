@@ -5,17 +5,21 @@ require 'tkextlib/tile'
 require_relative './function_evaluator'
 require_relative './function_grapher'
 
-def graph
+$function_grapher = FunctionGrapher.new
+$function_grapher.zoom = 1
+$function_grapher.x_orig = -100
+$function_grapher.y_orig = -100
+
+def draw_graph
   fe = FunctionEvaluator.new($function)
-  fg = FunctionGrapher.new($canvas, $zoom, $x_orig, $y_orig)
-  fg.graph(fe)
+  $function_grapher.graph(fe)
 end
 
 # Main window
 root = TkRoot.new { title "Graph!!" }
 
 # Inside window frame and layout
-content = Tk::Tile::Frame.new(root) { padding "3 3 12 12" }
+content = Tk::Tile::Frame.new(root) { padding "8" }
             .grid(sticky: 'nsew')
 
 TkGrid.columnconfigure root, 0, weight: 1
@@ -26,7 +30,7 @@ left_bar = Tk::Tile::Frame.new(content) { padding "0" }
              .grid(column: 1, row: 1, rowspan: 2, sticky: 'nsew')
 
 Tk::Tile::Label.new(left_bar) { text 'Function:' }
-  .grid(column: 1, row: 1)
+  .grid(column: 1, row: 1, sticky: 'w')
 $function = TkVariable.new("100 * Math.sin(x*0.05)")
 function_t = Tk::Tile::Entry.new(left_bar) { width 20; textvariable $function }
                .grid(column: 1, row: 2)
@@ -38,42 +42,25 @@ TkGrid.rowconfigure left_bar, 2, weight: 0
 # Big canvas
 $canvas = TkCanvas.new(content) { width 200; height 200 }
 $canvas.grid sticky: 'nwes', column: 2, row: 1
+$function_grapher.canvas = $canvas
 
 # Button bar below canvas
 buttons = Tk::Tile::Frame.new(content) { padding "0" }
             .grid( sticky: 'nsew', column: 2, row: 2)
 
-$zoom = TkVariable.new(1)
-zoom_l = Tk::Tile::Label.new(buttons) { text 'Zoom:' }
-           .grid(column: 1, row: 1)
-zoom_t = Tk::Tile::Entry.new(buttons) { width 4; textvariable $zoom }
-           .grid(column: 2, row: 1)
-
-$x_orig = TkVariable.new(-100)
-x_orig_l = Tk::Tile::Label.new(buttons) { text 'Left X:' }
-             .grid(column: 3, row: 1)
-x_orig_t = Tk::Tile::Entry.new(buttons) { width 4; textvariable $x_orig }
-             .grid(column: 4, row: 1)
-
-$y_orig = TkVariable.new(-100)
-y_orig_l = Tk::Tile::Label.new(buttons) { text 'Bottom Y:' }
-             .grid(column: 5, row: 1)
-y_orig_t = Tk::Tile::Entry.new(buttons) { width 4; textvariable $y_orig }
-             .grid(column: 6, row: 1, sticky: 'w')
+origin_button = Tk::Tile::Button.new(buttons) do
+  text "Origin!"
+  command { $function_grapher.center_function(0, 0); draw_graph }
+end.grid(column: 1, row: 1, sticky: 'es')
 
 graph_button = Tk::Tile::Button.new(buttons) do
   text "Graph!"
   default "active"
-  command { graph }
-end.grid(column: 7, row: 1, sticky: 'es')
+  command { draw_graph }
+end.grid(column: 2, row: 1, sticky: 'es')
 
-TkGrid.columnconfigure buttons, 1, weight: 0
+TkGrid.columnconfigure buttons, 1, weight: 1
 TkGrid.columnconfigure buttons, 2, weight: 0
-TkGrid.columnconfigure buttons, 3, weight: 0
-TkGrid.columnconfigure buttons, 4, weight: 0
-TkGrid.columnconfigure buttons, 5, weight: 0
-TkGrid.columnconfigure buttons, 6, weight: 0
-TkGrid.columnconfigure buttons, 6, weight: 1
 TkGrid.rowconfigure buttons, 1, weight: 1
 
 # Top layout
@@ -87,10 +74,8 @@ TkGrid.rowconfigure content, 2, weight: 0
 
 def mousewheel
   proc do |d|
-    z = $zoom.value.to_f
-    z = d > 0 ? z * 1.1 : z * 0.9
-    $zoom.value = (z).to_s
-    graph
+    $function_grapher.zoom_by(d > 0 ? 1.1 : 0.9, keep_center: true)
+    draw_graph
   end
 end
 
@@ -111,19 +96,14 @@ def mouse_drag
     $mouse_x = x
     $mouse_y = y
     return unless old_x && old_y
-    x_orig = $x_orig.value.to_f
-    y_orig = $y_orig.value.to_f
-    x_orig += (old_x - x)
-    y_orig += (y - old_y)  # y coords are reversed
-    $x_orig.value = x_orig
-    $y_orig.value = y_orig
-    graph
+    $function_grapher.move_canvas(old_x - x, old_y - y)
+    draw_graph
   end
 end
 
 def mouse_up
   proc do |x, y|
-    mouse_drag.call(x, y)
+    # mouse_drag.call(x, y)
     $mouse_x = nil
     $mouse_y = nil
   end
@@ -135,5 +115,3 @@ $canvas.bind("B1-ButtonRelease", mouse_up, '%x %y')
 
 # Turn everything on!!
 Tk.mainloop
-
-
