@@ -1,4 +1,4 @@
-# Graph - Dynamic visualizer for mathematical functions in Ruby
+# Function Grapher
 
 A graphical playground for mathematical functions writen in Ruby and
 [TkComponent](https://github.com/josepegea/tk_component).
