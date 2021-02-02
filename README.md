@@ -1,31 +1,87 @@
-# Graph - An example app using Ruby and TK
+# Graph - Dynamic visualizer for mathematical functions in Ruby
 
-## Installing
+A graphical playground for mathematical functions writen in Ruby and
+[TkComponent](https://github.com/josepegea/tk_component).
 
-### macOS
+![GIF demo](https://i.ibb.co/FVmNdCV/Teaser.gif)
 
-You need to install Tcl/Tk in your Mac.
+## Visualizing functions
 
-According to https://tkdocs.com/tutorial/install.html it seems that
-the best option is, ATM, the community edition of ActiveState at
-https://www.activestate.com/products/tcl/downloads/
+You can input any valid Ruby expression and it will be evaluated after
+pressing the `Graph!` button.
 
-You need to register for free in order to download the installer.
+The evaluator expects your expression to refer to `x` as the function
+argument. You don't need to type the `y=` part.
 
-Once done, you can run `bundle install` and it should be ready. In my
-case, it failed the first time but repeating the command worked.
+Examples
 
-## Ruby/TK docs
+``` ruby
+x ** 2 + 3 * x - 5
+```
 
-- https://tkdocs.com/tutorial/index.html (you can select "Ruby" in the
-  dropdown list on the right side menu to only show the examples in
-  Ruby)
-  
-- https://www.tutorialspoint.com/ruby/ruby_tk_guide.htm
+``` ruby
+Math.sin(x)
+```
 
-- https://tcl.tk/man/tcl8.6/TkCmd/contents.htm (General TK ref)
+``` ruby
+Math.exp(x)
+```
+
+## Panning and Zooming
+
+You pan across the function space by clicking and drawing with the
+mouse at any point in the drawing area.
+
+You can zoom in and out by using the scrollwheel.
 
 
+## Adding parameters
 
+If you reference any other variable apart from `x` in your expression
+it will be considered an editable parameter.
 
+Example
 
+``` ruby
+a * x ** 2 + b * x + c
+```
+
+Typing this expression and clicking on the `Update params` button will
+give you three editable fields where you can tweak the values for `a`,
+`b` and `c`.
+
+You can tweak these values by moving an slider or by direct input.
+
+You can also change the range used by the slider.
+
+In every case, the function should update in real time with every
+change.
+
+## Running it
+
+After cloning the repo, get all the gems installed.
+
+    $ bundle install
+
+After that, you can launch the app with
+
+    $ bundle exec main_app.rb
+
+**NOTE** You need Tk installed in your system. See more information
+about that in
+[TkComponent](https://github.com/josepegea/tk_component).
+
+## Previous versions
+
+In addition to the current version, there are two other simpler
+versions that you can check here:
+
+- [graph.rb](graph.rb) A simple version that doesn't use TkComponent, just plain
+  Tk and Ruby.
+
+- [new_graph.rb](new_graph.rb) A version that does the same as `graph.rb` but using
+  TkComponent. Good to check simple TkComponent concepts.
+
+## Author
+
+Josep Egea <https://github.com/josepegea>

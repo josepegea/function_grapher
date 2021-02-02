@@ -1,6 +1,6 @@
-require 'pry'
-require 'tk'
-require 'tkextlib/tile'
+#!/usr/bin/env ruby
+
+require 'tk_component'
 
 require_relative 'graph_component'
 

@@ -1,4 +1,5 @@
-require 'pry'
+#!/usr/bin/env ruby
+
 require 'tk'
 require 'tkextlib/tile'
 

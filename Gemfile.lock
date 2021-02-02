@@ -1,7 +1,7 @@
 PATH
   remote: ../tk_component
   specs:
-    tk_component (0.1.0)
+    tk_component (0.2.0)
       activesupport (~> 6.0.3)
       tk (~> 0.3.0)
 

@@ -17,49 +17,47 @@ class GraphComponent < TkComponent::Base
     @params = {}
   end
 
-  def generate(parent_component, options = {})
-    parse_component(parent_component, options) do |p|
-      p.frame(padding: "8", sticky: 'nsew', x_flex: 1, y_flex: 1) do |f|
-        f.row do |r|
-          r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
-            vf.label(text: "Function: ", sticky: "w")
-            vf.text(width: 20, height: 5,
-                    font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
-                    highlightthickness: 0,
-                    value: @function, sticky: 'wens') do |en|
-              en.on_change ->(e) { @function = e.sender.s_value }
-            end
-            vf.button(text: "Update params", on_click: :update_params)
-            vf.vframe do |vvf|
-              @params.each do |k, v|
-                vvf.insert_component(ParamComponent,
-                                    self,
-                                    name: k.to_s,
-                                    value: v || 0.0,
-                                    min: 0.0,
-                                    max: 1.0) do |pc|
-                  pc.on_event 'ParamChanged', ->(e) do
-                    param = e.data_object
-                    params[param.name.to_sym] = param.value
-                    draw_graph
-                  end
+  def render(p, parent_component)
+    p.frame(padding: "8", sticky: 'nsew', x_flex: 1, y_flex: 1) do |f|
+      f.row do |r|
+        r.vframe(rowspan: 2, sticky: 'n', padding: 2) do |vf|
+          vf.label(text: "Function: ", sticky: "w")
+          vf.text(width: 20, height: 5,
+                  font: "TkTextFont", borderwidth: 0, padx: 2, pady: 0, relief: "flat",
+                  highlightthickness: 0,
+                  value: @function, sticky: 'wens') do |en|
+            en.on_change ->(e) { @function = e.sender.s_value }
+          end
+          vf.button(text: "Update params", on_click: :update_params)
+          vf.vframe do |vvf|
+            @params.each do |k, v|
+              vvf.insert_component(ParamComponent,
+                                   self,
+                                   name: k.to_s,
+                                   value: v || 0.0,
+                                   min: 0.0,
+                                   max: 1.0) do |pc|
+                pc.on_event 'ParamChanged', ->(e) do
+                  param = e.data_object
+                  params[param.name.to_sym] = param.value
+                  draw_graph
                 end
               end
             end
           end
-          @canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', x_flex: 1, y_flex: 1) do |cv|
-            cv.on_mouse_wheel ->(e) { mousewheel(e) }
-            cv.on_mouse_drag ->(e) { mouse_drag(e) }, button: 1
-            cv.on_mouse_up ->(e) { mouse_up(e) }, button: 1
-          end
         end
-        f.row do |r|
-          r.hframe(sticky: "e") do |hf|
-            hf.button(text: "Origin!") do |b|
-              b.on_click ->(e) { @function_grapher.center_function(0, 0); draw_graph }
-            end
-            hf.button(text: "Graph!", default: "active", on_click: :draw_graph)
+        @canvas = r.canvas(width: 600, height: 600, sticky: 'nwes', x_flex: 1, y_flex: 1) do |cv|
+          cv.on_mouse_wheel ->(e) { mousewheel(e) }
+          cv.on_mouse_drag ->(e) { mouse_drag(e) }, button: 1
+          cv.on_mouse_up ->(e) { mouse_up(e) }, button: 1
+        end
+      end
+      f.row do |r|
+        r.hframe(sticky: "e") do |hf|
+          hf.button(text: "Origin!") do |b|
+            b.on_click ->(e) { @function_grapher.center_function(0, 0); draw_graph }
           end
+          hf.button(text: "Graph!", default: "active", on_click: :draw_graph)
         end
       end
     end
