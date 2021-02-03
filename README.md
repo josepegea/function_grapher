@@ -84,4 +84,11 @@ versions that you can check here:
 
 ## Author
 
-Josep Egea <https://github.com/josepegea>
+Josep Egea
+  - <https://github.com/josepegea>
+  - <https://www.josepegea.com/>
+
+## License
+
+The gem is available as open source under the terms of the [MIT
+License](https://opensource.org/licenses/MIT).
